@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 3 - Consume API</title>
+    <script>
+        const apiBaseUrl = 'http://localhost:3001/api/carreras';
+
+        const error = (e) => console.log(e.target.responseText);
+
+        function saveCarrera() {
+            const ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.addEventListener("load", completed);
+            ajaxRequest.addEventListener("error", error);
+            ajaxRequest.open("POST", apiBaseUrl);
+            ajaxRequest.setRequestHeader("Content-Type", "application/json");
+
+            const data = {
+                'nombre': document.getElementById('nombre').value,
+                'codigo': document.getElementById('codigo').value,
+                'descripcion': document.getElementById('descripcion').value
+            };
+            ajaxRequest.send(JSON.stringify(data));
+        }
+
+        function completed(response) {
+            console.log(response.target.responseText);
+            getCarreras();
+        }
+
+        function renderCarreras(carreras) {
+            let html = "<table>";
+            carreras.forEach(carrera => {
+                html += `<tr><td>${carrera.nombre}</td><td>${carrera.codigo}</td><td>${carrera.descripcion}</td><td><button onclick="editCarrera('${carrera._id}')"> Edit </button> <button onclick="deleteCarrera('${carrera._id}')"> Delete </button></td></tr>`;
+            });
+            html += '</table>';
+
+            document.getElementById('tableList').innerHTML = html;
+        }
+
+        function getCarreras() {
+            const ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.addEventListener("load", (response) => {
+                const carrerasResponse = JSON.parse(response.target.responseText);
+                renderCarreras(carrerasResponse);
+            });
+            ajaxRequest.addEventListener("error", error);
+            ajaxRequest.open("GET", apiBaseUrl);
+            ajaxRequest.setRequestHeader("Content-Type", "application/json");
+            ajaxRequest.send();
+        }
+
+        function deleteCarrera(id) {
+            const ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.addEventListener("load", (response) => {
+                console.log(response.target.responseText);
+                getCarreras();
+            });
+            ajaxRequest.addEventListener("error", error);
+            ajaxRequest.open("DELETE", `${apiBaseUrl}/${id}`);
+            ajaxRequest.setRequestHeader("Content-Type", "application/json");
+            ajaxRequest.send();
+        }
+
+        function editCarrera(id) {
+            const nombre = prompt("Nombre:");
+            const codigo = prompt("Código:");
+            const descripcion = prompt("Descripción:");
+
+            const ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.addEventListener("load", (response) => {
+                console.log(response.target.responseText);
+                getCarreras();
+            });
+            ajaxRequest.addEventListener("error", error);
+            ajaxRequest.open("PUT", `${apiBaseUrl}/${id}`);
+            ajaxRequest.setRequestHeader("Content-Type", "application/json");
+
+            const data = {
+                'nombre': nombre,
+                'codigo': codigo,
+                'descripcion': descripcion
+            };
+            ajaxRequest.send(JSON.stringify(data));
+        }
+
+        document.addEventListener('DOMContentLoaded', getCarreras);
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <form>
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-1-12 col-form-label">Nombre</label>
+                <div class="col-sm-1-12">
+                    <input type="text" class="form-control" name="nombre" id="nombre" placeholder="">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-1-12 col-form-label">Código</label>
+                <div class="col-sm-1-12">
+                    <input type="text" class="form-control" name="codigo" id="codigo" placeholder="">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputName" class="col-sm-1-12 col-form-label">Descripción</label>
+                <div class="col-sm-1-12">
+                    <input type="text" class="form-control" name="descripcion" id="descripcion" placeholder="">
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="offset-sm-2 col-sm-10">
+                    <button type="button" class="btn btn-primary" id="saveButton" onclick="saveCarrera()">Guardar</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="tableList"></div>
+    </div>
+</body>
+
+</html>
