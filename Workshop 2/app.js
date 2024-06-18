@@ -27,3 +27,8 @@ app.post('/usuario', (req, res) => {
 app.listen(port, () => {
   console.log(`API escuchando en http://localhost:${port}`);
 });
+
+
+//http://localhost:3000/hola
+//http://localhost:3000/hola?mensaje=Universo
+//http://localhost:3000/usuario
